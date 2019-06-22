@@ -7,8 +7,11 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -28,7 +31,11 @@ public class Termo implements Serializable {
 	@Column(name = "data_cadastro")
 	private Date dataCadastro;
 	
-	@Column(name = "id_post")
+	@Column(name = "data_postagem")
+	private Date dataPostagem;
+	
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "id_post")
 	private Post post;
 	
 	public int getIdTermo() {
@@ -55,5 +62,10 @@ public class Termo implements Serializable {
 	public void setPost(Post post) {
 		this.post = post;
 	}
-	
+	public Date getDataPostagem() {
+		return dataPostagem;
+	}
+	public void setDataPostagem(Date dataPostagem) {
+		this.dataPostagem = dataPostagem;
+	}
 }
