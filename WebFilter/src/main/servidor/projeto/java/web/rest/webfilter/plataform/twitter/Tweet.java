@@ -5,7 +5,7 @@ import java.io.Serializable;
 public class Tweet implements Serializable {
 	private static final long serialVersionUID = -7044360851101914451L;
 	private String created_at;
-	private Integer id;
+	private Long id;
 	private String id_str;
 	private String text;
 	private Entity entities;
@@ -34,10 +34,10 @@ public class Tweet implements Serializable {
 	public void setText(String text) {
 		this.text = text;
 	}
-	public Integer getId() {
+	public Long getId() {
 		return id;
 	}
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 }

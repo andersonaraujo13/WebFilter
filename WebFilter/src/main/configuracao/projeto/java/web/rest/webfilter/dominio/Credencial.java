@@ -3,18 +3,21 @@ package projeto.java.web.rest.webfilter.dominio;
 import static javax.persistence.GenerationType.IDENTITY;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
 @Table(schema = "configuracao", name = "credenciais")
-public class Credenciais implements Serializable {
+public class Credencial implements Serializable {
 
 	private static final long serialVersionUID = 3080177198805987917L;
 
@@ -23,15 +26,6 @@ public class Credenciais implements Serializable {
 	@Column(name = "id_credenciais", unique = true, nullable = false)
 	private Integer idCredenciais;
 	
-	@Column(name = "api_key")
-	private String apiKey;
-
-	@Column(name = "api_secret_key")
-	private String apiSecretKey;
-	
-	@Column(name = "aceess_token")
-	private String accessToken;
-	
 	@Enumerated(EnumType.STRING)
 	@Column(name = "plataforma")
 	private Plataforma platforma;
@@ -39,11 +33,8 @@ public class Credenciais implements Serializable {
 	@Column(name = "ativo")
 	private Boolean ativo;
 	
-	@Column(name = "usuario")
-	private String usuario;
-	
-	@Column(name = "senha")
-	private String senha;
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "credencial")
+	private List<Parametro> parametros;
 
 	public Integer getIdCredenciais() {
 		return idCredenciais;
@@ -51,30 +42,6 @@ public class Credenciais implements Serializable {
 
 	public void setIdCredenciais(Integer idCredenciais) {
 		this.idCredenciais = idCredenciais;
-	}
-
-	public String getAccessToken() {
-		return accessToken;
-	}
-
-	public void setAccessToken(String accessToken) {
-		this.accessToken = accessToken;
-	}
-
-	public String getApiKey() {
-		return apiKey;
-	}
-
-	public void setApiKey(String apiKey) {
-		this.apiKey = apiKey;
-	}
-
-	public String getApiSecretKey() {
-		return apiSecretKey;
-	}
-
-	public void setApiSecretKey(String apiSecretKey) {
-		this.apiSecretKey = apiSecretKey;
 	}
 
 	public Plataforma getPlatforma() {
@@ -93,20 +60,12 @@ public class Credenciais implements Serializable {
 		this.ativo = ativo;
 	}
 
-	public String getUsuario() {
-		return usuario;
+	public List<Parametro> getParametros() {
+		return parametros;
 	}
 
-	public void setUsuario(String usuario) {
-		this.usuario = usuario;
-	}
-
-	public String getSenha() {
-		return senha;
-	}
-
-	public void setSenha(String senha) {
-		this.senha = senha;
+	public void setParametros(List<Parametro> parametros) {
+		this.parametros = parametros;
 	}
 	
 }
