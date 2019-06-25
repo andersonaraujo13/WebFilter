@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -20,7 +19,6 @@ import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
 import com.google.gson.Gson;
@@ -32,13 +30,11 @@ import projeto.java.web.rest.webfilter.dominio.Credencial;
 import projeto.java.web.rest.webfilter.dominio.Parametro;
 import projeto.java.web.rest.webfilter.dominio.Post;
 import projeto.java.web.rest.webfilter.dominio.Termo;
-import projeto.java.web.rest.webfilter.plataform.twitter.Auth;
 import projeto.java.web.rest.webfilter.plataform.twitter.Tweet;
 import projeto.java.web.rest.webfilter.plataform.twitter.TwitterVars;
 import projeto.java.web.rest.webfilter.repository.ParametroRepository;
 import projeto.java.web.rest.webfilter.service.PostService;
 import projeto.java.web.rest.webfilter.service.TermoService;
-import projeto.java.web.rest.webfilter.task.FilterTask;
 import projeto.java.web.rest.webfilter.utils.StringUtils;
 
 @Component
@@ -55,7 +51,7 @@ public class TwitterStrategy implements PlataformStrategy, Serializable {
 	private Long max_id;
 	private Map<String, List<Parametro>> param;
 	
-	private static final Logger log = LoggerFactory.getLogger(FilterTask.class);
+	private static final Logger log = LoggerFactory.getLogger(TwitterStrategy.class);
 	
 	@Override
 	public void feeding(Credencial credenciais) {
@@ -63,6 +59,8 @@ public class TwitterStrategy implements PlataformStrategy, Serializable {
 			
 			Parametro count = param.get(TwitterVars.count.valor()).stream().findFirst().get();
 			Parametro max_per_feed = param.get(TwitterVars.max_per_feeding.valor()).stream().findFirst().get();;
+
+			Parametro parametroMaxId = param.get(TwitterVars.max_id.valor()).stream().findFirst().get();
 			
 			int max = Integer.parseInt(max_per_feed.getValue());
 			int lote = Integer.parseInt(count.getValue());
@@ -71,37 +69,15 @@ public class TwitterStrategy implements PlataformStrategy, Serializable {
 				JsonArray array = consumir(credenciais);
 				List<Tweet> tweets = convertToObject(array);
 				processar(tweets);
+				parametroMaxId.setValue(Long.toString(max_id - 1));
 			}
 			
-			Parametro parametro = param.get(TwitterVars.max_id.valor()).stream().findFirst().get();
-			parametro.setValue(Long.toString(max_id - 1));
-			parametroRepository.save(parametro);
+			parametroRepository.save(parametroMaxId);
 		
-	}
-	
-	
-	/*TODO nao funciona e desisitir de tentar*/
-	private Auth authentication(String apiKey, String secretKey) {
-		String keyBase64 = convertToBase64(secretKey + ":" + apiKey);
-		
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");	
-		headers.add("Authorization", "Basic " + keyBase64);
-		
-		List<String> map = new ArrayList<>();
-		map.add("grant_type=client_credentials");
-
-		
-		return null;
-	}
-
-	private String convertToBase64(String key) {
-		return Base64.getEncoder().encodeToString(key.getBytes());
 	}
 	
 	private boolean processar(List<Tweet> tweets) {
 		for(Tweet tweet : tweets){
-			SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd HH:mm:ss Z yyyy", Locale.ENGLISH);
 			Date date = getDate(tweet.getCreated_at());
 			
 			Post post = new Post();
@@ -120,6 +96,7 @@ public class TwitterStrategy implements PlataformStrategy, Serializable {
 				termo.setTermo(t);
 				termo.setPost(post);
 				termo.setDataPostagem(date);
+				termo.setDataPostagemMili(date.getTime());
 				
 				if(!termo.getTermo().isEmpty()) {
 					termoService.salvar(termo);

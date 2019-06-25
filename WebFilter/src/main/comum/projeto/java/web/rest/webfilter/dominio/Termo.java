@@ -31,6 +31,9 @@ public class Termo implements Serializable {
 	@Column(name = "data_cadastro")
 	private Date dataCadastro;
 	
+	@Column(name = "data_postagem_mili")
+	private Long dataPostagemMili;
+	
 	@Column(name = "data_postagem")
 	private Date dataPostagem;
 	
@@ -67,5 +70,11 @@ public class Termo implements Serializable {
 	}
 	public void setDataPostagem(Date dataPostagem) {
 		this.dataPostagem = dataPostagem;
+	}
+	public Long getDataPostagemMili() {
+		return dataPostagemMili;
+	}
+	public void setDataPostagemMili(Long dataPostagemMili) {
+		this.dataPostagemMili = dataPostagemMili;
 	}
 }
